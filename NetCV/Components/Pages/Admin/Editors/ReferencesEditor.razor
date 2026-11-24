@@ -1,0 +1,122 @@
+﻿@using Application.Services.Resources
+@using NetCV.Components.Pages.Admin.DialogCards
+@using NetCV.Components.Pages.Shared
+@using Microsoft.AspNetCore.Authorization
+
+@inject NotificationService NotificationService
+@inject DialogService DialogService
+@inject ResourceService<ReferenceDto> ReferenceService
+
+@rendermode InteractiveServer
+@attribute [Authorize]
+@page "/Admin/References"
+
+<PageTitle>Admin - References</PageTitle>
+
+<RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween" AlignItems="AlignItems.Center">
+    <RadzenText TextStyle="TextStyle.H3" Text="References" />
+    <RadzenButton Text="Add Reference" Icon="add" Click="OpenCreateDialogAsync" Variant="Variant.Flat" />
+</RadzenStack>
+
+<LoadingIndicator IsLoading="References is null" />
+
+@if (References is not null && !References.Any())
+{
+    <RadzenText Text="No references created yet" />
+}
+else if (References is not null)
+{
+    @foreach (var reference in References)
+    {
+        <RadzenCard Variant="Variant.Filled" class="p-3">
+            <RadzenRow>
+                <RadzenColumn Size="12" SizeMD="6">
+                    <RadzenLabel Component="Title" Text="Title" />
+                    <RadzenTextBox Name="Title" Value="@reference.Title" class="w-100" Change="title => { reference.Title = title; HasChanges = true; }" />
+                </RadzenColumn>
+                <RadzenColumn Size="12" SizeMD="6">
+                    <RadzenLabel Component="Employment" Text="Employment" />
+                    <RadzenTextBox Name="Employment" Value="@reference.Employment" class="w-100" Change="employment => { reference.Employment = employment; HasChanges = true; }" />
+                </RadzenColumn>
+                <RadzenColumn Size="12" SizeMD="11">
+                    <RadzenLabel Component="Text" Text="Text" />
+                    <RadzenTextArea Style="resize: none;" Rows="4" Name="Text" Value="@reference.Text" class="w-100" Change="text => { reference.Text = text; HasChanges = true; }" />
+                </RadzenColumn>
+                <RadzenColumn Size="12" SizeMD="1">
+                    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Right" AlignItems="AlignItems.End" Style="height: 100%;">
+                        <RadzenButton Variant="Variant.Flat" ButtonStyle="ButtonStyle.Danger" Icon="delete" Click="async () => await DeleteReferenceAsync(reference.Id)" />
+                    </RadzenStack>
+                </RadzenColumn>
+            </RadzenRow>
+        </RadzenCard>
+    }
+    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End">
+        <RadzenButton Variant="Variant.Flat" Text="Cancel"
+                      Visible="HasChanges" ButtonStyle="ButtonStyle.Info" Shade="Shade.Lighter"
+                      Click="async () => await CancelChangesAsync()" />
+        <RadzenButton Variant="Variant.Flat" Icon="done"
+                      Text="Save changes" Click="async () => await SaveChangesAsync()"
+                      Disabled="!HasChanges" />
+    </RadzenStack>
+}
+
+@code {
+    private IList<ReferenceDto>? References;
+    private bool HasChanges;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            References = (await ReferenceService.GetResourcesAsync()).ToList();
+            StateHasChanged();
+
+            DialogService.OnClose += async x =>
+            {
+                References = (await ReferenceService.GetResourcesAsync()).ToList();
+                StateHasChanged();
+            };
+        }
+    }
+
+    private async Task SaveChangesAsync()
+    {
+        if (HasChanges)
+        {
+            foreach (var reference in References!)
+            {
+                await ReferenceService.UpdateResourceAsync(reference);
+            }
+            HasChanges = false;
+            NotificationService.Notify(NotificationSeverity.Success,
+                "Updated references", $"References were updated.");
+        }
+    }
+
+    public async Task CancelChangesAsync()
+    {
+        References = (await ReferenceService.GetResourcesAsync()).ToList();
+        HasChanges = false;
+    }
+
+    private async Task OpenCreateDialogAsync()
+    {
+        var options = new DialogOptions
+        {
+            Width = "700px"
+        };
+
+        await DialogService.OpenAsync<CreateReferenceCard>("Add Reference", options: options);
+    }
+
+    private async Task DeleteReferenceAsync(long id)
+    {
+        await ReferenceService.DeleteResourceAsync(id);
+
+        var existingDbReference = References!.Single(e => e.Id == id);
+        References!.Remove(existingDbReference);
+
+        NotificationService.Notify(NotificationSeverity.Success,
+            "Deleted reference", $"Reference '{existingDbReference.Title}' was deleted.");
+    }
+}

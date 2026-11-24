@@ -1,0 +1,118 @@
+﻿@using Application.Services.Resources
+@using NetCV.Components.Pages.Admin.DialogCards
+@using NetCV.Components.Pages.Shared
+@using Microsoft.AspNetCore.Authorization
+
+@inject NotificationService NotificationService
+@inject DialogService DialogService
+@inject ResourceService<SkillDto> SkillService
+
+@rendermode InteractiveServer
+@attribute [Authorize]
+@page "/Admin/Skills"
+
+<PageTitle>Admin - Skills</PageTitle>
+
+<RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween" AlignItems="AlignItems.Center">
+    <RadzenText TextStyle="TextStyle.H3" Text="Skills" />
+    <RadzenButton Text="Add Skill" Icon="add" Click="OpenCreateDialogAsync" Variant="Variant.Flat" />
+</RadzenStack>
+
+<LoadingIndicator IsLoading="Skills is null" />
+
+@if (Skills is not null && !Skills.Any())
+{
+    <RadzenText Text="No skills created yet" />
+}
+else if (Skills is not null)
+{
+    @foreach (var skill in Skills)
+    {
+        <RadzenCard Variant="Variant.Filled" class="p-3">
+            <RadzenRow>
+                <RadzenColumn Size="12" SizeMD="6">
+                    <RadzenLabel Component="Name" Text="Name" />
+                    <RadzenTextBox Name="Name" Value="@skill.Name" class="w-100" Change="name => { skill.Name = name; HasChanges = true; }" />
+                </RadzenColumn>
+                <RadzenColumn Size="12" SizeMD="5">
+                    <RadzenLabel Component="Level" Text="@($"Level ({skill.Level})")" />
+                    <RadzenSlider Name="Level" class="w-100" TValue="int" Value="@skill.Level" Min="0" Max="100" Change="level => { skill.Level = level; HasChanges = true; }" />
+                </RadzenColumn>
+                <RadzenColumn Size="12" SizeMD="1">
+                    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Right" AlignItems="AlignItems.Center" Style="height: 100%;">
+                        <RadzenButton Variant="Variant.Flat" ButtonStyle="ButtonStyle.Danger" Icon="delete" Click="async () => await DeleteSkillAsync(skill.Id)" />
+                    </RadzenStack>
+                </RadzenColumn>
+            </RadzenRow>
+        </RadzenCard>
+    }
+    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End">
+        <RadzenButton Variant="Variant.Flat" Text="Cancel"
+                      Visible="HasChanges" ButtonStyle="ButtonStyle.Info" Shade="Shade.Lighter"
+                      Click="async () => await CancelChangesAsync()" />
+        <RadzenButton Variant="Variant.Flat" Icon="done"
+                      Text="Save changes" Click="async () => await SaveChangesAsync()"
+                      Disabled="!HasChanges" />
+    </RadzenStack>
+}
+
+@code {
+    private IList<SkillDto>? Skills;
+    private bool HasChanges;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            Skills = (await SkillService.GetResourcesAsync()).ToList();
+            StateHasChanged();
+
+            DialogService.OnClose += async x =>
+            {
+                Skills = (await SkillService.GetResourcesAsync()).ToList();
+                StateHasChanged();
+            };
+        }
+    }
+
+    private async Task SaveChangesAsync()
+    {
+        if (HasChanges)
+        {
+            foreach (var skill in Skills!)
+            {
+                await SkillService.UpdateResourceAsync(skill);
+            }
+            HasChanges = false;
+            NotificationService.Notify(NotificationSeverity.Success,
+                "Updated skills", "Skills were updated.");
+        }
+    }
+
+    public async Task CancelChangesAsync()
+    {
+        Skills = (await SkillService.GetResourcesAsync()).ToList();
+        HasChanges = false;
+    }
+
+    private async Task OpenCreateDialogAsync()
+    {
+        var options = new DialogOptions
+        {
+            Width = "700px"
+        };
+
+        await DialogService.OpenAsync<CreateSkillCard>("Add Skill", options: options);
+    }
+
+    private async Task DeleteSkillAsync(long id)
+    {
+        await SkillService.DeleteResourceAsync(id);
+
+        var existingDbSkill = Skills!.Single(s => s.Id == id);
+        Skills!.Remove(existingDbSkill);
+
+        NotificationService.Notify(NotificationSeverity.Success,
+            "Deleted skill", $"Skill '{existingDbSkill.Name}' was deleted.");
+    }
+}

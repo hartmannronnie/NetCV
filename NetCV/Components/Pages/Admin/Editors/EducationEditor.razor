@@ -1,0 +1,126 @@
+﻿@using Application.Services.Resources
+@using NetCV.Components.Pages.Admin.DialogCards
+@using NetCV.Components.Pages.Shared
+@using Microsoft.AspNetCore.Authorization
+
+@inject NotificationService NotificationService
+@inject DialogService DialogService
+@inject ResourceService<EducationDto> EducationService
+
+@rendermode InteractiveServer
+@attribute [Authorize]
+@page "/Admin/Education"
+
+<PageTitle>Admin - Education</PageTitle>
+
+<RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween" AlignItems="AlignItems.Center">
+    <RadzenText TextStyle="TextStyle.H3" Text="Education" />
+    <RadzenButton Text="Add Education" Icon="add" Click="OpenCreateDialogAsync" Variant="Variant.Flat" />
+</RadzenStack>
+
+<LoadingIndicator IsLoading="Educations is null" />
+
+@if (Educations is not null && !Educations.Any())
+{
+    <RadzenText Text="No educations created yet" />
+}
+else if (Educations is not null)
+{
+    @foreach (var education in Educations)
+    {
+        <RadzenCard Variant="Variant.Filled" class="p-3">
+            <RadzenText TextStyle="TextStyle.H5" Text="@education.School" />
+            <RadzenRow>
+                <RadzenColumn Size="12" SizeMD="5">
+                    <RadzenLabel Component="School" Text="School" />
+                    <RadzenTextBox Name="School" Value="@education.School" class="w-100" Change="school => { education.School = school; HasChanges = true; }" />
+                </RadzenColumn>
+                <RadzenColumn Size="12" SizeMD="3">
+                    <RadzenLabel Component="StartDate" Text="Start Date" />
+                    <RadzenDatePicker TValue="DateOnly" Name="StartDate" Value="@education.StartDate" class="w-100" Change="startDate => { education.StartDate = DateOnly.FromDateTime(startDate ?? DateTime.MinValue); HasChanges = true; }" />
+                </RadzenColumn>
+                <RadzenColumn Size="12" SizeMD="3">
+                    <RadzenLabel Component="EndDate" Text="End Date" />
+                    <RadzenDatePicker TValue="DateOnly" Name="EndDate" Value="@education.EndDate" class="w-100" Change="endDate => { education.EndDate = DateOnly.FromDateTime(endDate ?? DateTime.MinValue); HasChanges = true; }" />
+                </RadzenColumn>
+                <RadzenColumn Size="12" SizeMD="11">
+                    <RadzenLabel Component="Title" Text="Title" />
+                    <RadzenTextBox Name="Title" Value="@education.Title" class="w-100" Change="title => { education.Title = title; HasChanges = true; }" />
+                </RadzenColumn>
+                <RadzenColumn Size="12" SizeMD="1" Style="text-align: right;">
+                    <RadzenLabel class="w-100" />
+                    <RadzenButton Variant="Variant.Flat" ButtonStyle="ButtonStyle.Danger" Icon="delete" Click="async () => await DeleteExperienceAsync(education.Id)" />
+                </RadzenColumn>
+            </RadzenRow>
+        </RadzenCard>
+    }
+    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End">
+        <RadzenButton Variant="Variant.Flat" Text="Cancel"
+                      Visible="HasChanges" ButtonStyle="ButtonStyle.Info" Shade="Shade.Lighter"
+                      Click="async () => await CancelChangesAsync()" />
+        <RadzenButton Variant="Variant.Flat" Icon="done"
+                      Text="Save changes" Click="async () => await SaveChangesAsync()"
+                      Disabled="!HasChanges" />
+    </RadzenStack>
+}
+
+@code {
+    private IList<EducationDto>? Educations;
+    private bool HasChanges;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            Educations = (await EducationService.GetResourcesAsync()).ToList();
+            StateHasChanged();
+
+            DialogService.OnClose += async x =>
+            {
+                Educations = (await EducationService.GetResourcesAsync()).ToList();
+                StateHasChanged();
+            };
+        }
+    }
+
+    private async Task SaveChangesAsync()
+    {
+        if (HasChanges)
+        {
+            foreach (var education in Educations!)
+            {
+                await EducationService.UpdateResourceAsync(education);
+            }
+            HasChanges = false;
+            NotificationService.Notify(NotificationSeverity.Success,
+                "Updated experiences", "Experiences were updated.");
+        }
+    }
+
+    private async Task CancelChangesAsync()
+    {
+        Educations = (await EducationService.GetResourcesAsync()).ToList();
+        HasChanges = false;
+    }
+
+    private async Task OpenCreateDialogAsync()
+    {
+        var options = new DialogOptions
+        {
+            Width = "700px"
+        };
+
+        await DialogService.OpenAsync<CreateEducationCard>("Add Education", options: options);
+    }
+
+    private async Task DeleteExperienceAsync(long id)
+    {
+        await EducationService.DeleteResourceAsync(id);
+
+        var existingDbEducation = Educations!.Single(e => e.Id == id);
+        Educations!.Remove(existingDbEducation);
+
+        NotificationService.Notify(NotificationSeverity.Success,
+            "Deleted education", $"Education '{existingDbEducation.School}' was deleted.");
+    }
+}

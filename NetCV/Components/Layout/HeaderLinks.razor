@@ -1,0 +1,56 @@
+﻿@using Application.Services.Resources
+@using Microsoft.AspNetCore.Components.Authorization
+
+@inject ResourceService<HobbyDto> HobbyService
+@inject ResourceService<SkillDto> SkillService
+@inject ResourceService<ExperienceDto> ExperienceService
+@inject ResourceService<EducationDto> EducationService
+@inject ResourceService<ReferenceDto> ReferenceService
+
+@rendermode InteractiveServer
+
+<RadzenMenu Responsive="true" Style="text-align: right;">
+    <AuthorizeView>
+        <Authorized>
+            <RadzenMenuItem Path="/Admin" Text="Admin Panel" Icon="admin_panel_settings" Style="margin-right: 16px; padding-right: 16px; border-right: 1px solid #AAA;" />
+        </Authorized>
+    </AuthorizeView>
+    <RadzenMenuItem Path="#about" Text="About" />
+    @if (ShowHobbies)
+    {
+        <RadzenMenuItem Path="#hobbies" Text="Hobbies" />
+    }
+    @if (ShowSkills)
+    {
+        <RadzenMenuItem Path="#skills" Text="Skills" />
+    }
+    @if (ShowExperience)
+    {
+        <RadzenMenuItem Path="#experience" Text="Experience" />
+    }
+    @if (ShowEducation)
+    {
+        <RadzenMenuItem Path="#education" Text="Education" />
+    }
+    @if (ShowReferences)
+    {
+        <RadzenMenuItem Path="#references" Text="References" />
+    }
+</RadzenMenu>
+
+@code {
+    private bool ShowHobbies = false;
+    private bool ShowSkills = false;
+    private bool ShowExperience = false;
+    private bool ShowEducation = false;
+    private bool ShowReferences = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        ShowHobbies = (await HobbyService.GetResourcesAsync()).Any();
+        ShowSkills = (await SkillService.GetResourcesAsync()).Any();
+        ShowExperience = (await ExperienceService.GetResourcesAsync()).Any();
+        ShowEducation = (await EducationService.GetResourcesAsync()).Any();
+        ShowReferences = (await ReferenceService.GetResourcesAsync()).Any();
+    }
+}

@@ -1,0 +1,129 @@
+﻿@using Application.Services.Resources
+@using NetCV.Components.Pages.Admin.DialogCards
+@using NetCV.Components.Pages.Shared
+@using Microsoft.AspNetCore.Authorization
+
+@inject NotificationService NotificationService
+@inject DialogService DialogService
+@inject ResourceService<HobbyDto> HobbyService
+
+@rendermode InteractiveServer
+@attribute [Authorize]
+@page "/Admin/Hobbies"
+
+<PageTitle>Admin - Hobbies</PageTitle>
+
+<RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween" AlignItems="AlignItems.Center">
+    <RadzenText TextStyle="TextStyle.H3" Text="Hobbies" />
+    <RadzenButton Text="Add Hobby" Icon="add" Click="OpenCreateDialogAsync" Variant="Variant.Flat" />
+</RadzenStack>
+
+<LoadingIndicator IsLoading="Hobbies is null" />
+
+@if (Hobbies is not null && !Hobbies.Any())
+{
+    <RadzenText Text="No hobbies created yet" />
+}
+else if (Hobbies is not null)
+{
+    @foreach (var hobby in Hobbies)
+    {
+        <RadzenCard Variant="Variant.Filled" class="p-3">
+            <RadzenRow>
+                <RadzenColumn Size="12" SizeMD="5">
+                    <RadzenLabel Component="Name" Text="Name" />
+                    <RadzenTextBox Name="Name" Value="@hobby.Name" class="w-100" Change="name => { hobby.Name = name; HasChanges = true; }" />
+                </RadzenColumn>
+                <RadzenColumn Size="9" SizeMD="3">
+                    <RadzenLabel Component="Icon" Text="Icon" />
+                    <RadzenTextBox Name="Icon" Value="@hobby.Icon" class="w-100" Change="icon => { hobby.Icon = icon; HasChanges = true; }" />
+                </RadzenColumn>
+                <RadzenColumn Size="3" SizeMD="3">
+                    <RadzenLabel Text="Icon Preview" class="w-100" />
+                    @if (string.IsNullOrEmpty(hobby.Icon))
+                    {
+                        <RadzenText Text="-" class="p-2" />
+                    }
+                    else
+                    {
+                        <RadzenIcon Icon="@hobby.Icon" class="p-3" />
+                    }
+                </RadzenColumn>
+                <RadzenColumn Size="12" SizeMD="1">
+                    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Right" AlignItems="AlignItems.Center" Style="height: 100%;">
+                        <RadzenButton Variant="Variant.Flat" ButtonStyle="ButtonStyle.Danger" Icon="delete" Click="async () => await DeleteHobbyAsync(hobby.Id)" />
+                    </RadzenStack>
+                </RadzenColumn>
+            </RadzenRow>
+        </RadzenCard>
+    }
+    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End">
+        <RadzenButton Variant="Variant.Flat" Text="Cancel"
+                      Visible="HasChanges" ButtonStyle="ButtonStyle.Info" Shade="Shade.Lighter"
+                      Click="async () => await CancelChangesAsync()" />
+        <RadzenButton Variant="Variant.Flat" Icon="done"
+                      Text="Save changes" Click="async () => await SaveChangesAsync()"
+                      Disabled="!HasChanges" />
+    </RadzenStack>
+}
+
+@code {
+    private IList<HobbyDto>? Hobbies;
+    private bool HasChanges;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            Hobbies = (await HobbyService.GetResourcesAsync()).ToList();
+            StateHasChanged();
+
+            DialogService.OnClose += async x =>
+            {
+                Hobbies = (await HobbyService.GetResourcesAsync()).ToList();
+                StateHasChanged();
+            };
+        }
+    }
+
+    private async Task SaveChangesAsync()
+    {
+        if (HasChanges)
+        {
+            foreach (var hobby in Hobbies!)
+            {
+                await HobbyService.UpdateResourceAsync(hobby);
+            }
+            HasChanges = false;
+            NotificationService.Notify(NotificationSeverity.Success,
+                "Updated hobbies", $"Hobbies were updated.");
+        }
+    }
+
+    public async Task CancelChangesAsync()
+    {
+        Hobbies = (await HobbyService.GetResourcesAsync()).ToList();
+        HasChanges = false;
+    }
+
+    private async Task OpenCreateDialogAsync()
+    {
+        var options = new DialogOptions
+        {
+            Width = "700px"
+        };
+
+        await DialogService.OpenAsync<CreateHobbyCard>("Add Hobby", options: options);
+    }
+
+    private async Task DeleteHobbyAsync(long id)
+    {
+        await HobbyService.DeleteResourceAsync(id);
+
+        var existingDbHobby = Hobbies!.Single(e => e.Id == id);
+        Hobbies!.Remove(existingDbHobby);
+
+        NotificationService.Notify(NotificationSeverity.Success,
+            "Deleted hobby", $"Hobby '{existingDbHobby.Name}' was deleted.");
+    }
+}

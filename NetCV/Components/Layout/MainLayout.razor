@@ -1,0 +1,50 @@
+﻿@using Application.Services.Contents
+@using Application.Services.Settings
+@using NetCV.Components.Pages.Cv.Cards
+
+@inherits LayoutComponentBase
+
+@inject IContentService ContentService
+@inject NavigationManager NavigationManager
+
+<RadzenComponents />
+
+<RadzenLayout>
+    <RadzenHeader>
+        <RadzenRow Style="height: 100%;">
+            <RadzenColumn Size="0" SizeMD="1" SizeLG="2" />
+            <RadzenColumn Size="12" SizeMD="10" SizeLG="8">
+                <RadzenStack Style="height: 100%;" Orientation="Orientation.Horizontal" AlignItems="AlignItems.Start" JustifyContent="JustifyContent.SpaceBetween">
+                    <RadzenText TextStyle="TextStyle.DisplayH6" Style="padding-top: 11.5px;">CV @FullName</RadzenText>
+                    <HeaderLinks />
+                </RadzenStack>
+            </RadzenColumn>
+            <RadzenColumn Size="0" SizeMD="1" SizeLG="2" />
+        </RadzenRow>
+    </RadzenHeader>
+    <RadzenBody>
+        @if (!NavigationManager.Uri.Contains("/Login"))
+        {
+            <ProfileBanner />
+        }
+        <div class="body-padding">
+            <RadzenRow>
+                <RadzenColumn Size="0" SizeMD="1" SizeLG="2" />
+                <RadzenColumn Size="12" SizeMD="10" SizeLG="8">
+                    @Body
+                </RadzenColumn>
+                <RadzenColumn Size="0" SizeMD="1" SizeLG="2" />
+            </RadzenRow>
+        </div>
+        <Footer FullName="@FullName" />
+    </RadzenBody>
+</RadzenLayout>
+
+@code {
+    private string FullName = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        FullName = await ContentService.GetValueAsync("PROFILE_FULLNAME");
+    }
+}

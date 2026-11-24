@@ -1,0 +1,33 @@
+﻿@using Application.Services.Contents
+
+@inherits LayoutComponentBase
+
+@inject IContentService ContentService
+
+<RadzenComponents @rendermode="InteractiveServer" />
+
+<RadzenLayout>
+    <AdminHeaderSidebar />
+
+    <RadzenBody>
+        <div class="body-padding">
+            <RadzenRow>
+                <RadzenColumn Size="0" SizeMD="1" SizeLG="2" />
+                <RadzenColumn Size="12" SizeMD="10" SizeLG="8" Style="padding: 16px;">
+                    @Body
+                </RadzenColumn>
+                <RadzenColumn Size="0" SizeMD="1" SizeLG="2" />
+            </RadzenRow>
+        </div>
+        <Footer FullName="@FullName" />
+    </RadzenBody>
+</RadzenLayout>
+
+@code {
+    private string FullName = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        FullName = await ContentService.GetValueAsync("PROFILE_FULLNAME");
+    }
+}

@@ -1,0 +1,14 @@
+﻿@using Microsoft.AspNetCore.Authorization
+
+@inject NavigationManager NavigationManager
+
+@attribute [Authorize]
+@page "/Admin"
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        NavigationManager.NavigateTo("/Admin/Settings", true);
+        await base.OnInitializedAsync();
+    }
+}

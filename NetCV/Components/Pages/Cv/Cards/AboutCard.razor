@@ -1,0 +1,104 @@
+﻿@using System.Globalization
+@using Application.Services.Contents
+
+@inject IContentService ContentService
+
+<RadzenCard id="about">
+    <RadzenRow>
+        <RadzenColumn Size="12" SizeMD="7">
+            <RadzenText TextStyle="TextStyle.H4" Text="About Me" />
+            <RadzenText TextStyle="TextStyle.Body1" Style="padding-right: 10px;">
+                @Text
+            </RadzenText>
+        </RadzenColumn>
+        <RadzenColumn Size="12" SizeMD="5">
+            <RadzenText TextStyle="TextStyle.H4" Text="Bio" />
+            <RadzenRow RowGap="0    ">
+                <RadzenColumn SizeMD="4">
+                    <RadzenStack Orientation="Orientation.Horizontal" Gap="5px">
+                        <RadzenIcon Icon="calendar_today" />
+                        <b>Age</b>
+                    </RadzenStack>
+                </RadzenColumn>
+                <RadzenColumn SizeMD="8" Style="padding-bottom: 12px;">
+                    @Age
+                </RadzenColumn>
+
+                <RadzenColumn SizeMD="4">
+                    <RadzenStack Orientation="Orientation.Horizontal" Gap="5px">
+                        <RadzenIcon Icon="email" />
+                        <b>E-Mail</b>
+                    </RadzenStack>
+                </RadzenColumn>
+                <RadzenColumn SizeMD="8" Style="padding-bottom: 12px;">
+                    <RadzenLink Path="@EmailLink" Text="@Email" />
+                </RadzenColumn>
+
+                <RadzenColumn SizeMD="4">
+                    <RadzenStack Orientation="Orientation.Horizontal" Gap="5px">
+                        <RadzenIcon Icon="phone" />
+                        <b>Phone</b>
+                    </RadzenStack>
+                </RadzenColumn>
+                <RadzenColumn SizeMD="8" Style="padding-bottom: 12px;">
+                    <RadzenLink Path="@PhoneLink" Text="@Phone" />
+                </RadzenColumn>
+
+                <RadzenColumn SizeMD="4">
+                    <RadzenStack Orientation="Orientation.Horizontal" Gap="5px">
+                        <RadzenIcon Icon="code" />
+                        <b>GitHub</b>
+                    </RadzenStack>
+                </RadzenColumn>
+                <RadzenColumn SizeMD="8" Style="padding-bottom: 12px;">
+                    <RadzenLink Path="@GitHubLink" Text="@GitHub" />
+                </RadzenColumn>
+
+                <RadzenColumn SizeMD="4">
+                    <RadzenStack Orientation="Orientation.Horizontal" Gap="5px">
+                        <RadzenIcon Icon="place" />
+                        <b>Wohnort</b>
+                    </RadzenStack>
+                </RadzenColumn>
+                <RadzenColumn SizeMD="8" Style="padding-bottom: 12px;">
+                    <RadzenText Text="@Residence" />
+                </RadzenColumn>
+            </RadzenRow>
+        </RadzenColumn>
+    </RadzenRow>
+</RadzenCard>
+
+@code {
+    private string Age = string.Empty;
+    private string Text = string.Empty;
+    private string Email = string.Empty;
+    private string EmailLink = string.Empty;
+    private string Phone = string.Empty;
+    private string PhoneLink = string.Empty;
+    private string GitHub = string.Empty;
+    private string GitHubLink = string.Empty;
+    private string Residence = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var plainDateOfBirth = await ContentService.GetValueAsync("ABOUT_BIRTHDATE");
+        var dateOfBirth = DateTime.ParseExact(plainDateOfBirth, "dd/MM/yyyy", CultureInfo.InvariantCulture);
+        var today = DateTime.Now;
+        var age = today.Year - dateOfBirth.Year;
+
+        if (today < dateOfBirth.AddYears(age))
+        {
+            age--;
+        }
+
+        Age = age.ToString();
+        Text = await ContentService.GetValueAsync("ABOUT_TEXT");
+        Email = await ContentService.GetValueAsync("ABOUT_EMAIL");
+        EmailLink = await ContentService.GetValueAsync("ABOUT_EMAIL_LINK");
+        Phone = await ContentService.GetValueAsync("ABOUT_PHONE");
+        PhoneLink = await ContentService.GetValueAsync("ABOUT_PHONE_LINK");
+        GitHub = await ContentService.GetValueAsync("ABOUT_GITHUB");
+        GitHubLink = await ContentService.GetValueAsync("ABOUT_GITHUB_LINK");
+        Residence = await ContentService.GetValueAsync("ABOUT_RESIDENCE");
+    }
+}

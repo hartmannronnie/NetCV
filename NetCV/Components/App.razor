@@ -1,0 +1,48 @@
+﻿@using Application.Services.Contents
+@using Application.Services.Settings
+
+@inject IContentService ContentService
+@inject ISettingsService SettingsService
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta name="title" content="CV @FullName">
+    <meta name="description" content="@Description">
+    <meta name="keywords" content="CV, @FullName">
+    <meta name="language" content="English">
+    <meta name="robots" content="index, follow">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <base href="/" />
+    <link rel="stylesheet" href="_content/Radzen.Blazor/css/material-base.css">
+    <link rel="stylesheet" href="bootstrap/bootstrap.min.css" />
+    <link rel="stylesheet" href="app.css" />
+    <link rel="stylesheet" href="NetCV.styles.css" />
+    <link rel="icon" type="image/png" href="@($"images/{FavIconFileName}")" />
+    <HeadOutlet />
+</head>
+
+<body>
+    <Routes />
+    <script src="_content/Radzen.Blazor/Radzen.Blazor.js?v=@(typeof(Radzen.Colors).Assembly.GetName().Version)"></script>
+    <script src="_framework/blazor.web.js"></script>
+    <script src="js/downloadPdf.js" defer></script>
+</body>
+
+</html>
+
+@code {
+    private string FullName = string.Empty;
+    private string Description = string.Empty;
+    private string FavIconFileName = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        FullName = await ContentService.GetValueAsync("PROFILE_FULLNAME");
+        Description = await ContentService.GetValueAsync("ABOUT_TEXT");
+        FavIconFileName = await SettingsService.GetFavIconFileNameAsync();
+    }
+}

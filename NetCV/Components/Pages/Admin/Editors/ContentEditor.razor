@@ -1,0 +1,49 @@
+﻿@using Application.Services.Contents
+@using Microsoft.AspNetCore.Authorization
+@using NetCV.Components.Pages.Shared
+
+@inject NotificationService NotificationService
+@inject IContentService ContentService
+
+@rendermode InteractiveServer
+@attribute [Authorize]
+
+<RadzenCard Variant="Variant.Filled">
+    <RadzenText TextStyle="TextStyle.H4" Text="Content" />
+
+    <LoadingIndicator IsLoading="!Contents.Any()" />
+
+    <RadzenRow>
+        @foreach (var content in Contents)
+        {
+            <RadzenColumn Size="12" SizeMD="6">
+                <RadzenCard class="p-3" Variant="Variant.Outlined">
+                    <RadzenText TextStyle="TextStyle.Caption" Text="@content.Key" />
+                    <RadzenTextBox Value="@Contents[content.Key]" class="w-100"
+                                   Change="async value => await SaveChangeAsync(content.Key, value)" />
+                </RadzenCard>
+            </RadzenColumn>
+        }
+    </RadzenRow>
+</RadzenCard>
+
+@code {
+    private Dictionary<string, string> Contents = [];
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            Contents = (Dictionary<string, string>)await ContentService.GetAllValuesAsync();
+            StateHasChanged();
+        }
+    }
+
+    private async Task SaveChangeAsync(string key, string value)
+    {
+        await ContentService.SetValueAsync(key, value);
+        Contents[key] = value;
+        NotificationService.Notify(NotificationSeverity.Success,
+            "Updated content", $"'{key}' set to '{value}'");
+    }
+}
