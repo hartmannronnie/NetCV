@@ -15,7 +15,7 @@ public class CvDocument(PdfData data) : IDocument
 
     public void Compose(IDocumentContainer container)
     {
-        var portraitBytes = File.ReadAllBytes("wwwroot/images/portrait.jpg");
+        var portraitBytes = File.ReadAllBytes($"wwwroot/images/{_data.PortraitFileName}");
 
         container.Page(page =>
         {
