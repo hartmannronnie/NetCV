@@ -22,6 +22,7 @@ public class ExperienceDto : Resource<Experience>
         return StartDate == model.StartDate
             && EndDate == model.EndDate
             && string.Equals(Company, model.Company)
-            && string.Equals(CompanyLink, model.CompanyLink);
+            && string.Equals(CompanyLink, model.CompanyLink)
+            && string.Equals(Text, model.Text);
     }
 }
