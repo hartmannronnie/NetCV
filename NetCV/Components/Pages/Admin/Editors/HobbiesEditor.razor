@@ -67,6 +67,11 @@ else if (Hobbies is not null)
     </RadzenStack>
 }
 
+<RadzenAlert AlertStyle="AlertStyle.Info" AllowClose="false" Variant="Variant.Flat" Shade="Shade.Lighter">
+    All icons at
+    <RadzenLink Text="Material Icons" Target="_blank" Path="https://fonts.google.com/icons?icon.set=Material+Icons&icon.size=24&icon.color=%23e3e3e3&selected=Material+Icons+Outlined:search:" />
+</RadzenAlert>
+
 @code {
     private IList<HobbyDto>? Hobbies;
     private bool HasChanges;
