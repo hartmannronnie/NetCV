@@ -7,9 +7,9 @@
     <Title>NetCV</Title>
     <PackageProjectUrl>https://ronniehartmann.ch</PackageProjectUrl>
     <PackageReadmeFile>README.md</PackageReadmeFile>
-    <RepositoryUrl>https://github.com/ronniehartmann/NetCV</RepositoryUrl>
+    <RepositoryUrl>https://github.com/hartmannronnie/NetCV</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
-    <AssemblyVersion>0.5.0</AssemblyVersion>
+    <AssemblyVersion>0.6.0</AssemblyVersion>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
   </PropertyGroup>
 
