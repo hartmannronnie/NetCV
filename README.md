@@ -1,8 +1,7 @@
 ![NetCV_Logo](https://github.com/user-attachments/assets/79d1ec60-4ab1-492f-8972-685df346a937)
 
-[![Demo](https://img.shields.io/badge/Demo-ronniehartmann.ch-blue?style=flat-square)](https://ronniehartmann.ch)
 [![License](https://img.shields.io/github/license/ronniehartmann/NetCV?style=flat-square&color=blue)](https://github.com/ronniehartmann/NetCV?tab=MIT-1-ov-file#readme)
-[![Wiki](https://img.shields.io/badge/Wiki-gray?style=flat-square)](https://github.com/ronniehartmann/NetCV/wiki)
+[![Wiki](https://img.shields.io/badge/Wiki-gray?style=flat-square)](https://github.com/hartmannronnie/NetCV/wiki)
 
 # NetCV
 **NetCV** is an open-source web application built with the Blazor Server framework in C# and .NET. Designed to elegantly present your personal CV, NetCV provides a seamless experience for both users and administrators.
@@ -15,4 +14,4 @@
 Get started with NetCV to create a professional, easily updatable online CV that leaves a lasting impression.
 
 ## Development
-Use the instructions on the [Wiki](https://github.com/ronniehartmann/NetCV/wiki) to start developing.
+Use the instructions on the [Wiki](https://github.com/hartmannronnie/NetCV/wiki/Getting-Started) to start developing.
