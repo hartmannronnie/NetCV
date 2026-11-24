@@ -3,6 +3,7 @@ using Application.Services.Contents;
 using Application.Services.Pdf.Models;
 using Application.Services.Pdf.Templates;
 using Application.Services.Resources;
+using Application.Services.Settings;
 using Microsoft.Extensions.Logging;
 using QuestPDF.Fluent;
 using QuestPDF.Infrastructure;
@@ -13,6 +14,7 @@ namespace Application.Services.Pdf.Impl;
 public class QuestPdfService(
     ILogger<QuestPdfService> logger,
     IContentService contentService,
+    ISettingsService settingsService,
     ResourceService<HobbyDto> hobbyService,
     ResourceService<SkillDto> skillService,
     ResourceService<ExperienceDto> experienceService,
@@ -21,6 +23,7 @@ public class QuestPdfService(
 {
     private readonly ILogger<QuestPdfService> _logger = logger;
     private readonly IContentService _contentService = contentService;
+    private readonly ISettingsService _settingsService = settingsService;
     private readonly ResourceService<HobbyDto> _hobbyService = hobbyService;
     private readonly ResourceService<SkillDto> _skillService = skillService;
     private readonly ResourceService<ExperienceDto> _experienceService = experienceService;
@@ -48,6 +51,7 @@ public class QuestPdfService(
             FullName = await _contentService.GetValueAsync("PROFILE_FULLNAME"),
             Employment = await _contentService.GetValueAsync("PROFILE_EMPLOYMENT"),
             AboutText = await _contentService.GetValueAsync("ABOUT_TEXT"),
+            PortraitFileName = await _settingsService.GetPortraitFileNameAsync(),
             Bio = await GetBioDataAsync(),
             Hobbies = (await _hobbyService.GetResourcesAsync()).Select(h => h.Name),
             Skills = (await _skillService.GetResourcesAsync()).Select(s => s.Name),
