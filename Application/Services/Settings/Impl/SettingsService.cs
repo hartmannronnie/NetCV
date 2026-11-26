@@ -1,27 +1,52 @@
 ﻿using Domain.Repositories;
+using Microsoft.Extensions.Configuration;
 
 namespace Application.Services.Settings.Impl;
 
-public class SettingsService(ISettingsRepository settingsRepository) : ISettingsService
+public class SettingsService(
+    ISettingsRepository settingsRepository,
+    IConfiguration configuration) : ISettingsService
 {
     private readonly ISettingsRepository _settingsRepository = settingsRepository;
+    private readonly IConfiguration _configuration = configuration;
 
-    public async Task<string> GetFavIconFileNameAsync()
+    public async Task<string> GetFavIconFilePathAsync()
     {
         var settings = await _settingsRepository.GetSettingsAsync();
-        return settings.FavIconFileName;
+        var basePath = _configuration.GetSection("ImageKit:BaseUrl").Value;
+
+        if (string.IsNullOrEmpty(settings.FavIconFileName) || string.IsNullOrEmpty(basePath))
+        {
+            return "images/favicon.ico";
+        }
+
+        return $"{basePath}/{settings.FavIconFileName}";
     }
 
-    public async Task<string> GetPortraitFileNameAsync()
+    public async Task<string> GetPortraitFilePathAsync()
     {
         var settings = await _settingsRepository.GetSettingsAsync();
-        return settings.PortraitImageFileName;
+        var basePath = _configuration.GetSection("ImageKit:BaseUrl").Value;
+
+        if (string.IsNullOrEmpty(settings.PortraitImageFileName) || string.IsNullOrEmpty(basePath))
+        {
+            return "images/portrait.jpg";
+        }
+
+        return $"{basePath}/{settings.PortraitImageFileName}";
     }
 
-    public async Task<string> GetBackgroundFileNameAsync()
+    public async Task<string> GetBackgroundFilePathAsync()
     {
         var settings = await _settingsRepository.GetSettingsAsync();
-        return settings.BackgroundImageFileName;
+        var basePath = _configuration.GetSection("ImageKit:BaseUrl").Value;
+
+        if (string.IsNullOrEmpty(settings.BackgroundImageFileName) || string.IsNullOrEmpty(basePath))
+        {
+            return "images/profile-background.jpg";
+        }
+
+        return $"{basePath}/{settings.BackgroundImageFileName}";
     }
 
     public async Task<bool> GetOpenToWorkAsync()

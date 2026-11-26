@@ -17,9 +17,9 @@ public class SettingsRepository(IDbContextFactory<CvContext> contextFactory) : I
         {
             settings = new Settings
             {
-                FavIconFileName = "favicon.ico",
-                BackgroundImageFileName = "profile-background.jpg",
-                PortraitImageFileName = "portrait.jpg",
+                FavIconFileName = null,
+                BackgroundImageFileName = null,
+                PortraitImageFileName = null,
                 OpenToWork = true,
                 ShowFooter = false,
                 ShowVersion = true,
@@ -35,9 +35,6 @@ public class SettingsRepository(IDbContextFactory<CvContext> contextFactory) : I
     public async Task SetSettingsAsync(Settings settings)
     {
         ArgumentNullException.ThrowIfNull(settings);
-        ArgumentException.ThrowIfNullOrWhiteSpace(settings.FavIconFileName);
-        ArgumentException.ThrowIfNullOrWhiteSpace(settings.PortraitImageFileName);
-        ArgumentException.ThrowIfNullOrWhiteSpace(settings.BackgroundImageFileName);
 
         using var context = await _contextFactory.CreateDbContextAsync();
         var existingSettings = await context.Settings.FirstOrDefaultAsync();

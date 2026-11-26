@@ -4,11 +4,11 @@ public class Settings
 {
     public long Id { get; set; }
 
-    public required string FavIconFileName { get; set; }
+    public string? FavIconFileName { get; set; }
 
-    public required string PortraitImageFileName { get; set; }
+    public string? PortraitImageFileName { get; set; }
 
-    public required string BackgroundImageFileName { get; set; }
+    public string? BackgroundImageFileName { get; set; }
 
     public required bool OpenToWork { get; set; }
 

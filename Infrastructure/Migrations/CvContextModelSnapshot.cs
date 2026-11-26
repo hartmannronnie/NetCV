@@ -39,12 +39,12 @@ namespace Infrastructure.Migrations
                         new
                         {
                             Key = "PROFILE_FULLNAME",
-                            Value = "Max Mustermann"
+                            Value = "John Doe"
                         },
                         new
                         {
                             Key = "PROFILE_EMPLOYMENT",
-                            Value = "Applikationsentwickler"
+                            Value = "Software Engineer"
                         },
                         new
                         {
@@ -59,12 +59,12 @@ namespace Infrastructure.Migrations
                         new
                         {
                             Key = "ABOUT_EMAIL",
-                            Value = "max@ronniehartmann.ch"
+                            Value = "john@netcv.com"
                         },
                         new
                         {
                             Key = "ABOUT_EMAIL_LINK",
-                            Value = "mailto:max@ronniehartmann.ch"
+                            Value = "mailto:john@netcv.com"
                         },
                         new
                         {
@@ -79,12 +79,12 @@ namespace Infrastructure.Migrations
                         new
                         {
                             Key = "ABOUT_GITHUB",
-                            Value = "ronniehartmann"
+                            Value = "hartmannronnie"
                         },
                         new
                         {
                             Key = "ABOUT_GITHUB_LINK",
-                            Value = "https://github.com/ronniehartmann"
+                            Value = "https://github.com/hartmannronnie"
                         },
                         new
                         {
@@ -260,18 +260,15 @@ namespace Infrastructure.Migrations
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Id"));
 
                     b.Property<string>("BackgroundImageFileName")
-                        .IsRequired()
                         .HasColumnType("longtext");
 
                     b.Property<string>("FavIconFileName")
-                        .IsRequired()
                         .HasColumnType("longtext");
 
                     b.Property<bool>("OpenToWork")
                         .HasColumnType("tinyint(1)");
 
                     b.Property<string>("PortraitImageFileName")
-                        .IsRequired()
                         .HasColumnType("longtext");
 
                     b.Property<bool>("ShowFooter")
@@ -291,10 +288,7 @@ namespace Infrastructure.Migrations
                         new
                         {
                             Id = 1L,
-                            BackgroundImageFileName = "profile-background.jpg",
-                            FavIconFileName = "favicon.ico",
                             OpenToWork = true,
-                            PortraitImageFileName = "portrait.jpg",
                             ShowFooter = false,
                             ShowPoweredByNetCv = true,
                             ShowVersion = true

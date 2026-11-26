@@ -15,8 +15,6 @@ public class CvDocument(PdfData data) : IDocument
 
     public void Compose(IDocumentContainer container)
     {
-        var portraitBytes = File.ReadAllBytes($"wwwroot/images/{_data.PortraitFileName}");
-
         container.Page(page =>
         {
             page.DefaultTextStyle(_defaultTextStyle);
@@ -24,7 +22,7 @@ public class CvDocument(PdfData data) : IDocument
             page.Content()
                 .Column(column =>
                 {
-                    column.Item().Component(new ProfileComponent(portraitBytes, _data.FullName, _data.Employment));
+                    column.Item().Component(new ProfileComponent(_data.PortraitBytes, _data.FullName, _data.Employment));
 
                     column.Item().Row(row =>
                     {

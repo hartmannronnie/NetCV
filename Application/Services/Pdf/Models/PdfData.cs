@@ -8,7 +8,7 @@ public class PdfData
 
     public string AboutText { get; set; } = string.Empty;
 
-    public string PortraitFileName { get; set; } = "portrait.jpg";
+    public byte[] PortraitBytes { get; set; } = [];
 
     public IEnumerable<BioDataItem> Bio { get; set; } = [];
 

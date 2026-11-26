@@ -36,9 +36,9 @@
                         <InputFile id="favicon-upload" OnChange="UpdateFavIconAsync" style="display: none;" />
                     </RadzenColumn>
                     <RadzenColumn Size="12" SizeMD="8" class="text-end">
-                        @if (!string.IsNullOrEmpty(FavIconFileName))
+                        @if (!string.IsNullOrEmpty(FavIconFilePath))
                         {
-                            <img src="@($"images/{FavIconFileName}")" class="portrait-image" />
+                            <img src="@FavIconFilePath" class="portrait-image" />
                         }
                         else
                         {
@@ -60,9 +60,9 @@
                         <InputFile id="portrait-upload" OnChange="UpdatePortraitAsync" style="display: none;" />
                     </RadzenColumn>
                     <RadzenColumn Size="12" SizeMD="8" class="text-end">
-                        @if (!string.IsNullOrEmpty(PortraitFileName))
+                        @if (!string.IsNullOrEmpty(PortraitFilePath))
                         {
-                            <img src="@($"images/{PortraitFileName}")" class="portrait-image" />
+                            <img src="@PortraitFilePath" class="portrait-image" />
                         }
                         else
                         {
@@ -84,9 +84,9 @@
                         <InputFile id="background-upload" OnChange="UpdateBackgroundAsync" style="display: none;" />
                     </RadzenColumn>
                     <RadzenColumn Size="12" SizeMD="8" class="text-end">
-                        @if (!string.IsNullOrEmpty(BackgroundFileName))
+                        @if (!string.IsNullOrEmpty(BackgroundFilePath))
                         {
-                            <img src="@($"images/{BackgroundFileName}")" class="background-image" />
+                            <img src="@BackgroundFilePath" class="background-image" />
                         }
                         else
                         {
@@ -158,9 +158,9 @@
 <ContentEditor />
 
 @code {
-    private string FavIconFileName = string.Empty;
-    private string PortraitFileName = string.Empty;
-    private string BackgroundFileName = string.Empty;
+    private string FavIconFilePath = string.Empty;
+    private string PortraitFilePath = string.Empty;
+    private string BackgroundFilePath = string.Empty;
     private bool OpenToWork = false;
     private bool ShowFooter = true;
     private bool ShowVersion = true;
@@ -168,9 +168,9 @@
 
     protected override async Task OnInitializedAsync()
     {
-        FavIconFileName = await SettingsService.GetFavIconFileNameAsync();
-        PortraitFileName = await SettingsService.GetPortraitFileNameAsync();
-        BackgroundFileName = await SettingsService.GetBackgroundFileNameAsync();
+        FavIconFilePath = await SettingsService.GetFavIconFilePathAsync();
+        PortraitFilePath = await SettingsService.GetPortraitFilePathAsync();
+        BackgroundFilePath = await SettingsService.GetBackgroundFilePathAsync();
         OpenToWork = await SettingsService.GetOpenToWorkAsync();
         ShowFooter = await SettingsService.GetShowFooterAsync();
         ShowVersion = await SettingsService.GetShowVersionAsync();
@@ -188,14 +188,12 @@
         try
         {
             using var stream = args.File.OpenReadStream();
-            var fileName = GenerateFileName(args.File.Name);
-            var oldFileName = await SettingsService.GetFavIconFileNameAsync();
+            var fileName = await FileUploadService.UploadFileAsync(stream, GenerateFileName(args.File.Name), 2097152);
 
-            if (await FileUploadService.UploadFileAsync(stream, $"wwwroot/images/{fileName}", 2097152))
+            if (!string.IsNullOrEmpty(fileName))
             {
                 await SettingsService.UpdateFavIconFileNameAsync(fileName);
-                FileUploadService.RemoveFile($"wwwroot/images/{oldFileName}");
-                FavIconFileName = fileName;
+                FavIconFilePath = await SettingsService.GetFavIconFilePathAsync();
                 NotificationService.Notify(NotificationSeverity.Success, "Image uploaded", "The favicon has successfully been updated.");
             }
             else
@@ -221,14 +219,12 @@
         try
         {
             using var stream = args.File.OpenReadStream();
-            var fileName = GenerateFileName(args.File.Name);
-            var oldFileName = await SettingsService.GetPortraitFileNameAsync();
+            var fileName = await FileUploadService.UploadFileAsync(stream, GenerateFileName(args.File.Name), 2097152);
 
-            if (await FileUploadService.UploadFileAsync(stream, $"wwwroot/images/{fileName}", 2097152))
+            if (!string.IsNullOrEmpty(fileName))
             {
                 await SettingsService.UpdatePortraitFileNameAsync(fileName);
-                FileUploadService.RemoveFile($"wwwroot/images/{oldFileName}");
-                PortraitFileName = fileName;
+                PortraitFilePath = await SettingsService.GetPortraitFilePathAsync();
                 NotificationService.Notify(NotificationSeverity.Success, "Image uploaded", "The portrait has successfully been updated.");
             }
             else
@@ -260,14 +256,12 @@
         try
         {
             using var stream = args.File.OpenReadStream(2097152);
-            var fileName = GenerateFileName(args.File.Name);
-            var oldFileName = await SettingsService.GetBackgroundFileNameAsync();
+            var fileName = await FileUploadService.UploadFileAsync(stream, GenerateFileName(args.File.Name), 2097152);
 
-            if (await FileUploadService.UploadFileAsync(stream, $"wwwroot/images/{fileName}", 2097152))
+            if (!string.IsNullOrEmpty(fileName))
             {
                 await SettingsService.UpdateBackgroundFileNameAsync(fileName);
-                FileUploadService.RemoveFile($"wwwroot/images/{oldFileName}");
-                BackgroundFileName = fileName;
+                BackgroundFilePath = await SettingsService.GetBackgroundFilePathAsync();
                 NotificationService.Notify(NotificationSeverity.Success, "Image uploaded", "The background has successfully been updated.");
             }
             else

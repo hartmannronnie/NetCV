@@ -11,6 +11,8 @@
 - **Dynamic CV Presentation**: Showcase your professional experience, skills, and accomplishments in a clean, modern format.
 - **One-Click PDF Download**: Allow visitors to easily download your CV as a PDF with just one click.
 - **Admin Panel**: Effortlessly manage and update all your CV details through an intuitive admin panel — no coding required.
+- **Customizable Images**: Customize your banner, portrait and favicon in the admin panel.
+- **Modern Radzen Design"**: Clean modern design using the [Radzen Component Library](https://blazor.radzen.com/).
 
 Get started with NetCV to create a professional, easily updatable online CV that leaves a lasting impression.
 
