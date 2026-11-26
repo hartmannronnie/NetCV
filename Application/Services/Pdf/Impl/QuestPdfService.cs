@@ -46,12 +46,23 @@ public class QuestPdfService(
 
     private async Task<PdfData> GetPdfDataAsync()
     {
+        var portraitPath = await _settingsService.GetPortraitFilePathAsync();
+        byte[] portraitBytes;
+        if (IsAbsoluteUri(portraitPath))
+        {
+            portraitBytes = await DownloadPortraitBytesAsync(portraitPath);
+        }
+        else
+        {
+            portraitBytes = await File.ReadAllBytesAsync($"wwwroot/{portraitPath}");
+        }
+
         return new PdfData
         {
             FullName = await _contentService.GetValueAsync("PROFILE_FULLNAME"),
             Employment = await _contentService.GetValueAsync("PROFILE_EMPLOYMENT"),
             AboutText = await _contentService.GetValueAsync("ABOUT_TEXT"),
-            PortraitFileName = await _settingsService.GetPortraitFilePathAsync(),
+            PortraitBytes = portraitBytes,
             Bio = await GetBioDataAsync(),
             Hobbies = (await _hobbyService.GetResourcesAsync()).Select(h => h.Name),
             Skills = (await _skillService.GetResourcesAsync()).Select(s => s.Name),
@@ -59,6 +70,13 @@ public class QuestPdfService(
             Educations = await GetEducationDataAsync(),
             References = await GetReferenceDataAsync()
         };
+    }
+
+    private async Task<byte[]> DownloadPortraitBytesAsync(string portraitUrl)
+    {
+        using var httpClient = new HttpClient();
+
+        return await httpClient.GetByteArrayAsync(portraitUrl);
     }
 
     private async Task<IEnumerable<BioDataItem>> GetBioDataAsync()
@@ -147,5 +165,11 @@ public class QuestPdfService(
             duration += "Today";
         }
         return duration;
+    }
+
+    private static bool IsAbsoluteUri(string path)
+    {
+        return Uri.TryCreate(path, UriKind.Absolute, out var uri)
+            && (uri.Scheme == Uri.UriSchemeHttp || uri.Scheme == Uri.UriSchemeHttps);
     }
 }
