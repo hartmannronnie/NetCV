@@ -11,9 +11,9 @@ public class SettingsConfiguration : IEntityTypeConfiguration<Settings>
         builder.HasData(new Settings
         {
             Id = 1,
-            FavIconFileName = "favicon.ico",
-            PortraitImageFileName = "portrait.jpg",
-            BackgroundImageFileName = "profile-background.jpg",
+            FavIconFileName = null,
+            PortraitImageFileName = null,
+            BackgroundImageFileName = null,
             OpenToWork = true,
             ShowFooter = false,
             ShowVersion = true,

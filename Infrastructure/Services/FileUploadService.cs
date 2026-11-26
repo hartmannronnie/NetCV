@@ -1,12 +1,17 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Imagekit;
+using Imagekit.Models.Files;
+using Microsoft.Extensions.Logging;
 
 namespace Infrastructure.Services;
 
-public class FileUploadService(ILogger<FileUploadService> logger)
+public class FileUploadService(
+    ILogger<FileUploadService> logger,
+    ImageKitClient client)
 {
     private readonly ILogger<FileUploadService> _logger = logger;
+    private readonly ImageKitClient _client = client;
 
-    public async Task<bool> UploadFileAsync(Stream stream, string fullPath, int maxFileSize)
+    public async Task<string?> UploadFileAsync(Stream stream, string fileName, int maxFileSize)
     {
         if (stream.Length > maxFileSize)
         {
@@ -14,21 +19,26 @@ public class FileUploadService(ILogger<FileUploadService> logger)
                 "Image could not be uploaded. File size ({} bytes) exceeds maximum size of {} bytes.", 
                 stream.Length, maxFileSize);
 
-            return false;
+            return null;
         }
 
-        using var destinationStream = new FileStream(fullPath, FileMode.Create);
-        await stream.CopyToAsync(destinationStream);
-        return true;
-    }
-
-    public void RemoveFile(string fullPath)
-    {
-        if (!File.Exists(fullPath))
+        var parameters = new FileUploadParams
         {
-            return;
+            File = stream,
+            FileName = fileName,
+        };
+
+        var result = await _client.Files.Upload(parameters);
+        try
+        {
+            result.Validate();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error occurred while validating file upload result.");
+            return null;
         }
 
-        File.Delete(fullPath);
+        return result.FilePath;
     }
 }

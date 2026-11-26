@@ -8,6 +8,7 @@ using Application.Services.Resources.Impl;
 using Application.Services.Settings;
 using Application.Services.Settings.Impl;
 using Domain.Repositories;
+using Imagekit;
 using Infrastructure;
 using Infrastructure.Identity;
 using Infrastructure.Identity.Stores;
@@ -61,8 +62,15 @@ builder.Services.AddTransient<IHobbyRepository, HobbyRepository>();
 builder.Services.AddTransient<IReferenceRepository, ReferenceRepository>();
 builder.Services.AddTransient<ISettingsRepository, SettingsRepository>();
 builder.Services.AddTransient<ISkillRepository, SkillRepository>();
-builder.Services.AddTransient<FileUploadService>();
 
+builder.Services.AddSingleton<ImageKitClient>(x =>
+{
+    return new ImageKitClient
+    {
+        PrivateKey = builder.Configuration.GetSection("ImageKit:PrivateKey").Value!,
+    };
+});
+builder.Services.AddTransient<FileUploadService>();
 builder.Services.AddTransient<IPdfService, QuestPdfService>();
 builder.Services.AddTransient<IContentService, ContentService>();
 builder.Services.AddTransient<ISettingsService, SettingsService>();
