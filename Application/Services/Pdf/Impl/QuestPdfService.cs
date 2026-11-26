@@ -51,7 +51,7 @@ public class QuestPdfService(
             FullName = await _contentService.GetValueAsync("PROFILE_FULLNAME"),
             Employment = await _contentService.GetValueAsync("PROFILE_EMPLOYMENT"),
             AboutText = await _contentService.GetValueAsync("ABOUT_TEXT"),
-            PortraitFileName = await _settingsService.GetPortraitFileNameAsync(),
+            PortraitFileName = await _settingsService.GetPortraitFilePathAsync(),
             Bio = await GetBioDataAsync(),
             Hobbies = (await _hobbyService.GetResourcesAsync()).Select(h => h.Name),
             Skills = (await _skillService.GetResourcesAsync()).Select(s => s.Name),

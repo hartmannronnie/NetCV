@@ -2,11 +2,11 @@
 
 public interface ISettingsService
 {
-    Task<string> GetFavIconFileNameAsync();
+    Task<string> GetFavIconFilePathAsync();
 
-    Task<string> GetPortraitFileNameAsync();
+    Task<string> GetPortraitFilePathAsync();
 
-    Task<string> GetBackgroundFileNameAsync();
+    Task<string> GetBackgroundFilePathAsync();
 
     Task<bool> GetOpenToWorkAsync();
 

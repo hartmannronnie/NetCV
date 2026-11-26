@@ -21,7 +21,7 @@
     <link rel="stylesheet" href="bootstrap/bootstrap.min.css" />
     <link rel="stylesheet" href="app.css" />
     <link rel="stylesheet" href="NetCV.styles.css" />
-    <link rel="icon" type="image/png" href="@($"images/{FavIconFileName}")" />
+    <link rel="icon" type="image/png" href="@FavIconFilePath" />
     <HeadOutlet />
 </head>
 
@@ -37,12 +37,12 @@
 @code {
     private string FullName = string.Empty;
     private string Description = string.Empty;
-    private string FavIconFileName = string.Empty;
+    private string FavIconFilePath = string.Empty;
 
     protected override async Task OnInitializedAsync()
     {
         FullName = await ContentService.GetValueAsync("PROFILE_FULLNAME");
         Description = await ContentService.GetValueAsync("ABOUT_TEXT");
-        FavIconFileName = await SettingsService.GetFavIconFileNameAsync();
+        FavIconFilePath = await SettingsService.GetFavIconFilePathAsync();
     }
 }

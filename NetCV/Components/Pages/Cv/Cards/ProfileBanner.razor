@@ -10,11 +10,11 @@
 
 @rendermode InteractiveServer
 
-<div style="background-image: url('/images/@BackgroundFileName'); background-size: cover; background-position: center; margin-bottom: 50px;">
+<div style="background-image: url('@BackgroundFilePath'); background-size: cover; background-position: center; margin-bottom: 50px;">
     <RadzenRow>
         <RadzenColumn Size="12" SizeMD="6" Style="text-align: center;">
             <div class="portrait-container">
-                <img class="portrait" src="@($"images/{PortraitFileName}")" alt="Portrait of @FullName" />
+                <img class="portrait" src="@PortraitFilePath" alt="Portrait of @FullName" />
                 @if (OpenToWork)
                 {
                     <div class="open-to-work">Open to work</div>
@@ -46,8 +46,8 @@
 </div>
 
 @code {
-    private string PortraitFileName = string.Empty;
-    private string BackgroundFileName = string.Empty;
+    private string PortraitFilePath = string.Empty;
+    private string BackgroundFilePath = string.Empty;
     private bool OpenToWork = false;
     private string FullName = string.Empty;
     private string Employment = string.Empty;
@@ -56,8 +56,8 @@
 
     protected override async Task OnInitializedAsync()
     {
-        PortraitFileName = await SettingsService.GetPortraitFileNameAsync();
-        BackgroundFileName = await SettingsService.GetBackgroundFileNameAsync();
+        PortraitFilePath = await SettingsService.GetPortraitFilePathAsync();
+        BackgroundFilePath = await SettingsService.GetBackgroundFilePathAsync();
         OpenToWork = await SettingsService.GetOpenToWorkAsync();
         FullName = await ContentService.GetValueAsync("PROFILE_FULLNAME");
         Employment = await ContentService.GetValueAsync("PROFILE_EMPLOYMENT");
